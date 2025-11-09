@@ -18,10 +18,10 @@ export function handle(data) {
         href="${link.url}" 
         target="_blank" 
         rel="noopener noreferrer"
-        class="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-purple-600 transition"
+        class="w-12 h-12 bg-gray-800 rounded-full flex items-center justify-center hover:bg-gradient-to-r hover:from-pink-500 hover:to-red-500 transition transform hover:scale-110"
         aria-label="${link.platform}"
       >
-        <i class="${link.icon} text-lg"></i>
+        <i class="${link.icon} text-xl"></i>
       </a>
     `;
     socialContainer.innerHTML += linkHTML;
