@@ -2,7 +2,7 @@ import { defineConfig } from 'vite';
 
 export default defineConfig({
     root: 'src',
-    base: '/staticsnack-template-blog/',
+    base: '/StaticSnack-template-band/',
     build: {
         outDir: '..',
         emptyOutDir: false,
