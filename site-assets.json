@@ -73,6 +73,6 @@
       "handler": "handlers/social.js",
       "maxSize": 5120,
       "allowedExtensions": [".json"]
-    },
+    }
   ]
 }
