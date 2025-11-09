@@ -1,24 +1,24 @@
 {
   "links": [
     {
-      "platform": "twitter",
-      "url": "https://twitter.com",
+      "platform": "Facebook",
+      "url": "https://facebook.com/bandname",
+      "icon": "fab fa-facebook-f"
+    },
+    {
+      "platform": "Instagram",
+      "url": "https://instagram.com/bandname",
+      "icon": "fab fa-instagram"
+    },
+    {
+      "platform": "Twitter",
+      "url": "https://twitter.com/bandname",
       "icon": "fab fa-twitter"
     },
     {
-      "platform": "github",
-      "url": "https://github.com",
-      "icon": "fab fa-github"
-    },
-    {
-      "platform": "linkedin",
-      "url": "https://linkedin.com",
-      "icon": "fab fa-linkedin"
-    },
-    {
-      "platform": "instagram",
-      "url": "https://instagram.com",
-      "icon": "fab fa-instagram"
+      "platform": "TikTok",
+      "url": "https://tiktok.com/@bandname",
+      "icon": "fab fa-tiktok"
     }
   ]
 }
