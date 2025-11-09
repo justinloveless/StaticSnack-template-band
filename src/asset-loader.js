@@ -6,6 +6,30 @@
 let siteAssets = null;
 let contentData = {};
 
+// Get the base URL from Vite's environment variable (handles GitHub Pages subpaths)
+const BASE_URL = import.meta.env.BASE_URL || '/';
+
+/**
+ * Resolve a path with the base URL
+ * @param {string} path - The relative path to resolve
+ * @returns {string} The resolved path with base URL
+ */
+function resolvePath(path) {
+    // If path already starts with BASE_URL, return as is
+    if (path.startsWith(BASE_URL)) {
+        return path;
+    }
+    // If BASE_URL is just '/', return path as is (avoid double slashes)
+    if (BASE_URL === '/') {
+        return path;
+    }
+    // Remove leading slash from path if present to avoid double slashes
+    const cleanPath = path.startsWith('/') ? path.slice(1) : path;
+    // Ensure BASE_URL ends with slash
+    const baseWithSlash = BASE_URL.endsWith('/') ? BASE_URL : BASE_URL + '/';
+    return baseWithSlash + cleanPath;
+}
+
 /**
  * Load site assets configuration, all content files, and handlers
  * @param {string|Function} assetsPathOrCallback - Path to site-assets.json file (default: 'site-assets.json') or callback function
@@ -24,7 +48,7 @@ export async function loadSiteAssets(assetsPathOrCallback = 'site-assets.json', 
     }
 
     try {
-        const response = await fetch(assetsPath);
+        const response = await fetch(resolvePath(assetsPath));
         siteAssets = await response.json();
         await loadContentFiles();
         await loadHandlers(callback);
@@ -58,14 +82,14 @@ async function loadContentFiles() {
             continue;
         }
 
-        // For images, just store the path
+        // For images, store the resolved path
         if (asset.type === 'image') {
-            contentData[asset.path] = asset.path;
+            contentData[asset.path] = resolvePath(asset.path);
             continue;
         }
 
         try {
-            const response = await fetch(asset.path);
+            const response = await fetch(resolvePath(asset.path));
             if (!response.ok) continue;
 
             if (asset.type === 'json' || asset.path.endsWith('.json')) {
@@ -105,7 +129,7 @@ async function loadComboAssets(asset) {
 
     // Since we can't list directories in browser, we'll use a different approach:
     // Attempt to fetch files and group by basename
-    const response = await fetch(dirPath);
+    const response = await fetch(resolvePath(dirPath));
     if (!response.ok) {
         console.warn(`Could not access directory: ${dirPath}`);
         return comboData;
@@ -158,17 +182,17 @@ async function loadComboAssets(asset) {
 
             try {
                 if (assetType === 'image') {
-                    // Store path for images
-                    comboData[baseName][ext] = filePath;
+                    // Store resolved path for images
+                    comboData[baseName][ext] = resolvePath(filePath);
                 } else if (assetType === 'json') {
                     // Load and parse JSON
-                    const response = await fetch(filePath);
+                    const response = await fetch(resolvePath(filePath));
                     if (response.ok) {
                         comboData[baseName][ext] = await response.json();
                     }
                 } else if (assetType === 'text') {
                     // Load text content
-                    const response = await fetch(filePath);
+                    const response = await fetch(resolvePath(filePath));
                     if (response.ok) {
                         comboData[baseName][ext] = await response.text();
                     }
@@ -191,7 +215,7 @@ async function loadSimpleDirectoryAssets(asset) {
 
     // Load manifest.json to discover files in the directory
     try {
-        const manifestResponse = await fetch(`${dirPath}/manifest.json`);
+        const manifestResponse = await fetch(resolvePath(`${dirPath}/manifest.json`));
         if (manifestResponse.ok) {
             const manifest = await manifestResponse.json();
             if (manifest.files && Array.isArray(manifest.files)) {
@@ -199,7 +223,7 @@ async function loadSimpleDirectoryAssets(asset) {
                 manifest.files.forEach(filename => {
                     const ext = filename.substring(filename.lastIndexOf('.'));
                     if (asset.contains.allowedExtensions.includes(ext)) {
-                        files.push(`${dirPath}/${filename}`);
+                        files.push(resolvePath(`${dirPath}/${filename}`));
                     }
                 });
                 return files;
@@ -259,4 +283,19 @@ export async function loadHandlers(onComplete) {
 export function getContentData() {
     return contentData;
 }
+
+/**
+ * Get the base URL used for asset loading
+ * @returns {string} The base URL
+ */
+export function getBaseUrl() {
+    return BASE_URL;
+}
+
+/**
+ * Resolve a path with the base URL (exported for use in handlers)
+ * @param {string} path - The relative path to resolve
+ * @returns {string} The resolved path with base URL
+ */
+export { resolvePath };
 
